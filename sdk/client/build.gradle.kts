@@ -57,6 +57,7 @@ dependencies {
     api(libs.ktor.client.content.negotiation)
     api(libs.ktor.serialization.json)
     implementation(libs.unifiedpush.connector)
+    implementation(libs.androidx.splashscreen)
     lintChecks(project(":lint-rules"))
 
     testImplementation(libs.kotlin.test)

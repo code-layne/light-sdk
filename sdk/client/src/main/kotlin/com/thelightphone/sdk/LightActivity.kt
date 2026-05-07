@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -21,6 +22,8 @@ class LightActivity internal constructor() : ComponentActivity() {
 
     private val backStack = mutableListOf<SimpleLightScreen>()
     private val currentScreen = mutableStateOf<SimpleLightScreen?>(null)
+    private var contentReady = false
+    private val createdAt = android.os.SystemClock.elapsedRealtime()
 
     internal fun navigateTo(screen: SimpleLightScreen) {
         currentScreen.value?.notifyWillHide()
@@ -44,6 +47,9 @@ class LightActivity internal constructor() : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().setKeepOnScreenCondition {
+            !contentReady || android.os.SystemClock.elapsedRealtime() - createdAt < 1000
+        }
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -61,6 +67,7 @@ class LightActivity internal constructor() : ComponentActivity() {
         currentScreen.value = initial
 
         setContent {
+            androidx.compose.runtime.LaunchedEffect(Unit) { contentReady = true }
             val screen = currentScreen.value
             if (screen != null) {
                 Column(modifier = Modifier.fillMaxSize()) {

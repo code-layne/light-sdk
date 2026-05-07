@@ -86,7 +86,7 @@ class LightSdkService : Service() {
                     }
 
                     val result = if (methodId != null) {
-                        runCatching { handleRequest(methodId, payload) }
+                        runCatching { handleRequest(callingId, methodId, payload) }
                             .getOrElse {
                                 Log.e(TAG, "Error handling request: $methodId", it)
                                 LightResult.Error(LightResult.ErrorCode.Unknown)
@@ -115,7 +115,7 @@ class LightSdkService : Service() {
         }
     }
 
-    private fun handleRequest(methodId: String, payload: String?): LightResult<String> {
+    private fun handleRequest(callingId: Int, methodId: String, payload: String?): LightResult<String> {
         return when (allMethods[methodId]) {
             LightServiceMethod.GetToken -> {
                 val token = issueToken(Binder.getCallingUid())
@@ -145,8 +145,8 @@ class LightSdkService : Service() {
             }
 
             null -> {
-                Log.e(TAG, "Service method $methodId not found!")
-                LightResult.Error(LightResult.ErrorCode.Unknown, "unknown method: $methodId")
+                // The app that wraps this server may be able to handle custom methods
+                LightSdkServer.customServiceMethodResolver.invoke(callingId, methodId, payload)
             }
         }
     }

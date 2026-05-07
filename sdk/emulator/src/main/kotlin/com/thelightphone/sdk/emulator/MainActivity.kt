@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.thelightphone.sdk.server.LightPushRegistry
 import com.thelightphone.sdk.server.LightSdkServer
 import com.thelightphone.sdk.server.LightSdkServer.filterVerifiedTools
 import com.thelightphone.sdk.server.LightSdkServer.queryInstalledClients
 import com.thelightphone.sdk.server.LightSdkServer.runningAsSystemApp
+import com.thelightphone.sdk.shared.LightResult
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +52,11 @@ class MainActivity : ComponentActivity() {
                 "WARNING: LightOS emulator is NOT running as a system app and may not work."
             )
         }
-        LightPushRegistry.endpointFetcher = { token, vapid ->
+        LightSdkServer.customServiceMethodResolver = { callingId, methodId, payload ->
+            Log.d("LightEmulator", "unknown service method: $methodId")
+            LightResult.Error(LightResult.ErrorCode.Unknown)
+        }
+        LightSdkServer.pushEndpointFetcher = { callingPackage, token, vapid ->
             // TODO this will refer to internal http server eventually
             Log.d("LightEmulator", "getting push endpoint for token: $token, vapid: $vapid")
             "http://localhost/push/$token"
@@ -78,7 +82,10 @@ class MainActivity : ComponentActivity() {
                             }
                     }, launchPackage = {
                         packageManager.getLaunchIntentForPackage(it)?.let { intent ->
-                            startActivity(intent)
+                            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                            val options =
+                                android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
+                            startActivity(intent, options.toBundle())
                         }
                     })
             }

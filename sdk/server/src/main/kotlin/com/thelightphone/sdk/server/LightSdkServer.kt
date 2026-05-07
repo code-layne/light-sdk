@@ -7,9 +7,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Process
-import android.os.UserHandle
 import android.util.Log
 import com.thelightphone.sdk.shared.LightConstants
+import com.thelightphone.sdk.shared.LightResult
 
 
 data class InstalledClient(
@@ -30,7 +30,7 @@ object LightSdkServer {
     /**
      * returns true iff this server version supports tools built with given sdkVersion
      */
-    fun isSdkVersionSupported(sdkVersion: String) : Boolean {
+    fun isSdkVersionSupported(sdkVersion: String): Boolean {
         return true
     }
 
@@ -70,4 +70,27 @@ object LightSdkServer {
             InstalledClient(packageInfo, sdkVersion)
         }.filterNotNull()
     }
+
+    /**
+     * return the POST endpoint that the calling tool's application server should use to
+     * get UnifiedPush through Light's server, down to LightOS/emulator, then over to Tool
+     *
+     * Settable from enclosing application!! May be run on any thread
+     */
+    var pushEndpointFetcher: (callingPackage: String, token: String, vapid: String?) -> String? =
+        { callingPackage, token, vapid ->
+            Log.e(TAG, "no endpoint fetch function provided - defaulting to localhost.")
+            "https://localhost/$token"
+        }
+
+    /**
+     * handle custom requests from clients that are "privileged"/in-development
+     *
+     * Settable from enclosing application!! May be run on any thread
+     */
+    var customServiceMethodResolver: (callingId: Int, methodId: String, payload: String?) -> LightResult<String> =
+        { callingId, methodId, payload ->
+            Log.e(TAG, "Service method $methodId not found!")
+            LightResult.Error(LightResult.ErrorCode.Unknown, "unknown method: $methodId")
+        }
 }

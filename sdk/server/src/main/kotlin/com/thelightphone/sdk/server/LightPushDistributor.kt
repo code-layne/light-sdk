@@ -70,7 +70,7 @@ class LightPushDistributor : BroadcastReceiver() {
         val vapid = intent.getStringExtra("vapid")
 
         val endpoint = runCatching {
-            LightPushRegistry.endpointFetcher.invoke(token, vapid)
+            LightSdkServer.pushEndpointFetcher.invoke(callerPackage, token, vapid)
         }.getOrNull()
 
         if (endpoint == null) {
