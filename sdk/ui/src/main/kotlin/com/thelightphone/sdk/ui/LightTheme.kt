@@ -1,0 +1,175 @@
+package com.thelightphone.sdk.ui
+
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+/**
+ * A minimal design system inspired by LightOS.
+ *
+ * This is intentionally small: it provides token-level building blocks (typography + colors)
+ * that higher-level components can build on.
+ */
+
+@Immutable
+data class LightColors(
+    val background: Color,
+    val content: Color,
+    val contentSecondary: Color,
+)
+
+@Immutable
+data class LightTypography(
+    val title: TextStyle,
+    val subtitle: TextStyle,
+    val heading: TextStyle,
+    val subheading: TextStyle,
+    val copy: TextStyle,
+    val button: TextStyle,
+    val paragraph: TextStyle,
+    val paragraphWide: TextStyle,
+    val detail: TextStyle,
+    val fine: TextStyle,
+    val superfine: TextStyle,
+    val micro: TextStyle,
+)
+
+private val DefaultColors = LightColors(
+    background = Color.Black,
+    content = Color.White,
+    contentSecondary = Color(0xFFBBBBBB),
+)
+
+/**
+ * These values mirror the LP3 table in `LightOS/src/style/index.ts` (unscaled).
+ */
+private val DefaultTypography = LightTypography(
+    title = TextStyle(
+        fontSize = 115.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Light,
+        lineHeight = (115 * 1.10).sp,
+    ),
+    subtitle = TextStyle(
+        fontSize = 52.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (52 * 1.20).sp,
+    ),
+    heading = TextStyle(
+        fontSize = 38.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (38 * 1.35).sp,
+    ),
+    subheading = TextStyle(
+        fontSize = 30.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        letterSpacing = (30 * 0.03).sp,
+        lineHeight = (30 * 1.25).sp,
+    ),
+    copy = TextStyle(
+        fontSize = 30.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (30 * 1.50).sp,
+    ),
+    button = TextStyle(
+        fontSize = 30.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        letterSpacing = (30 * 0.15).sp,
+        lineHeight = (30 * 1.10).sp,
+    ),
+    paragraph = TextStyle(
+        fontSize = 24.5.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (24.5 * 1.25).sp,
+    ),
+    paragraphWide = TextStyle(
+        fontSize = 25.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        letterSpacing = (25 * 0.02).sp,
+        lineHeight = (25 * 1.30).sp,
+    ),
+    detail = TextStyle(
+        fontSize = 20.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (20 * 1.45).sp,
+    ),
+    fine = TextStyle(
+        fontSize = 25.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        letterSpacing = (25 * 0.03).sp,
+        lineHeight = (25 * 1.15).sp,
+    ),
+    superfine = TextStyle(
+        fontSize = 16.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (16 * 1.20).sp,
+    ),
+    micro = TextStyle(
+        fontSize = 8.sp,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        lineHeight = (8 * 1.20).sp,
+    ),
+)
+
+val LocalLightColors = staticCompositionLocalOf { DefaultColors }
+val LocalLightTypography = staticCompositionLocalOf { DefaultTypography }
+
+object LightThemeTokens {
+    val colors: LightColors
+        @Composable get() = LocalLightColors.current
+
+    val typography: LightTypography
+        @Composable get() = LocalLightTypography.current
+}
+
+private fun toMaterialColorScheme(colors: LightColors): ColorScheme {
+    // Use MaterialTheme as a base so apps can still interop with M3 components,
+    // but prefer Light* primitives for consistent visuals.
+    return darkColorScheme(
+        background = colors.background,
+        surface = colors.background,
+        onBackground = colors.content,
+        onSurface = colors.content,
+        primary = colors.content,
+        onPrimary = colors.background,
+        secondary = colors.contentSecondary,
+        onSecondary = colors.background,
+    )
+}
+
+@Composable
+fun LightTheme(
+    colors: LightColors = DefaultColors,
+    typography: LightTypography = DefaultTypography,
+    content: @Composable () -> Unit,
+) {
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalLightColors provides colors,
+        LocalLightTypography provides typography,
+    ) {
+        MaterialTheme(
+            colorScheme = toMaterialColorScheme(colors),
+            content = content,
+        )
+    }
+}
+
