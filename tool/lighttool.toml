@@ -1,9 +1,12 @@
 [tool]
-id = "com.thelightphone.app"
-label = "Light SDK Tool"
+id = "com.thelightphone.brownnoise"
+label = "Brown Noise"
 versionCode = 1
-versionName = "1.0"
-permissions = ["android.permission.INTERNET"]
+versionName = "0.1.0"
+# Foreground AudioTrack needs no permissions. WAKE_LOCK is allowlisted but
+# currently unusable from a tool (no getSystemService), so we omit it until the
+# background-audio bridge lands. See docs/sdk-request-background-audio.md.
+permissions = []
 # change if you run this on an LP3!
 # serverPackage = "com.lightos"
 serverPackage = "com.thelightphone.sdk.emulator"
