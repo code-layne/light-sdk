@@ -48,8 +48,8 @@ avoid a silent `AudioTrack`/thread lingering off-screen. The UI says so:
 
 The real fix needs a **LightOS-side bridge method** exposing the background
 audio that Music/Podcasts already use. A feature-request draft for the Light
-team lives in the *ambient_lp* repo at
-`ambient_lp/docs/sdk-request-background-audio.md`. Summary of the ask: add a
+team lives alongside this file at `tool/sdk-request-background-audio.md`.
+Summary of the ask: add a
 `LightServiceMethod` that delegates playback to LightOS (same pattern as
 `SetRingtone` handing over a URI), gated behind a
 `BACKGROUND_AUDIO` permission. Easiest shape: hand LightOS a short seamlessly-
